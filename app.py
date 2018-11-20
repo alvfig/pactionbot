@@ -13,29 +13,44 @@ BOT_TOKEN = os.getenv("PACTIONBOT_TOKEN", "")
 
 
 MEANINGS = {
+    "2BR": "2 Bars Reversal - reversão de duas barras",
+    "2E": "Second Entry",
+    "2LT": "Second Leg Trap - armadilha de segunda perna",
+    "2S": "Second Signal",
     "AI": "Always In",
     "AIL": "Always In Long - modo sempre comprado",
     "AIS": "Always In Short - modo sempre vendido",
     "BC": "Broad Channel - canal amplo",
-    "BW": "Barbwire - arame farpado",
-    "BRR": "Bear Reversal",
+    "BGP": "Buying Pressure - pressão de compra",
+    "BLR": "Bull Reversal - reversão de alta",
+    "BLSHS": "Buy Low, Sell High, and Scalp - comprar baixo, vender alto, e lucrar curto (1:1)",
     "BO": "Breakout - rompimento",
     "BOM": "Breakout Mode - modo rompimento",
+    "BP": "Breakout Pullback - rompimento e correção",
+    "BRR": "Bear Reversal - reversão de baixa",
+    "BW": "Barbwire - arame farpado",
     "CLX": "Climax",
     "CT": "Countertrend",
     "DB": "Double Bottom - fundo duplo",
     "DT": "Double Top - topo duplo",
     "EB": "Entry Bar",
     "EMA": "Exponential Moving Average - média móvel exponencial",
+    "FBO": "Failed Breakout - falha de rompimento",
     "FF": "Final Flag - bandeira final",
-    "FT": "Follow Through",
+    "FT": "Follow Through - continuidade",
     "G": "Gap",
     "GB": "Gap Bar",
     "HH": "Higher High",
     "HL": "Higher Low",
+    "HOD": "High Of the Day - máxima do dia",
+    "HOY": "High Of Yesterday - máxima do dia anterior",
+    "HTF": "Higher Time Frame - tempo gráfico maior",
     "IB": "Inside Bar",
     "LH": "Lower High",
     "LL": "Lower Low",
+    "LOD": "Low Of Yesterday - mínima do dia anterior",
+    "LOM": "Limit Orders Market - mercado de ordens limitadas",
+    "LOY": "Low Of Yesterday - mínima do dia anterior",
     "MTR": "Major Trend Reversal - reversão majoritária de tendência",
     "MC": "Micro Channel",
     "MA": "Moving Average - média móvel",
@@ -43,8 +58,7 @@ MEANINGS = {
     "PA": "Price Action",
     "PB": "Pullback - correção",
     "RV": "Reversal - reversão",
-    "2E": "Second Entry",
-    "2S": "Second Signal",
+    "SGP": "Selling Pressure - pressão de venda",
     "SH": "Swing High",
     "SL": "Swing Low",
     "TBTL": "Ten Bars, Two Legs - dez barras, duas pernas",
@@ -52,15 +66,15 @@ MEANINGS = {
     "TE": "Trader's Equation - equação do trader",
     "TF": "Time Frame - tempo gráfico",
     "TR": "Trading Range - lateralidade",
+    "TREV": "Trend Reversal - reversão de tendência",
     "TTR": "Tight Trading Range - lateralidade estreita",
-    "CAMARAO": "É A MÃE !! CAMARÃO É A MÃE !!",
-    "CAMARÃO": "É A MÃE !! CAMARÃO É A MÃE !!",
+    "W": "Wedge - cunha",
 }
 
 
 def get_meaning(initials):
     global MEANINGS
-    return MEANINGS.get(initials, "Você digitou direitinho?\n\nCalma aí, gente! Ainda tô aprendendo. Isso aqui não é fácil nem pra robô.\n\nAhhhh! Pergunta lá no posto ipiranga.")
+    return MEANINGS.get(initials, None)
 
 
 def format_telegram_url(method):
@@ -73,8 +87,19 @@ def answer_command(update):
     data["chat_id"] = update["message"]["chat"]["id"]
     if "text" in update["message"]:
         message = update["message"]["text"]
-        initials = message.split()[-1].upper()
-        data["text"] = "`{} = {}`".format(initials, get_meaning(initials))
+        response = []
+        for initials in message.upper().split():
+            if "CAMAR" in initials:
+                response.append("É A MÃE !! CAMARÃO É A MÃE !!")
+                break
+            else:
+                meaning = get_meaning(initials)
+                if meaning:
+                    response.append("`{} = {}`".format(initials, meaning))
+        if response:
+            data["text"] = "\n".join(response)
+        else:
+            data["text"] = "Você digitou direitinho?\n\nCalma aí, gente! Ainda tô aprendendo. Isso aqui não é fácil nem pra robô.\n\nAhhhh! Pergunta lá no posto ipiranga."
         data["parse_mode"] = "Markdown"
         data["reply_to_message_id"] = update["message"]["message_id"]
         requests.post(format_telegram_url("sendMessage"), data=data)
