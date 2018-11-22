@@ -31,7 +31,7 @@ MEANINGS = {
     "BRR": "Bear Reversal - reversão de baixa",
     "BW": "Barbwire - arame farpado",
     "CLX": "Climax",
-    "CT": "Countertrend",
+    "CT": "Counter Trend - contra a tendência",
     "DB": "Double Bottom - fundo duplo",
     "DT": "Double Top - topo duplo",
     "EB": "Entry Bar",
@@ -60,6 +60,7 @@ MEANINGS = {
     "LOD": "Low Of the Day - mínima do dia",
     "LOM": "Limit Orders Market - mercado de ordens limitadas",
     "LOY": "Low Of Yesterday - mínima do dia anterior",
+    #"M2B": "Moving average touch with Double bottom Buy",
     "MTR": "Major Trend Reversal - reversão majoritária de tendência",
     "MC": "Micro Channel",
     "MA": "Moving Average - média móvel",
@@ -67,9 +68,11 @@ MEANINGS = {
     "PA": "Price Action",
     "PB": "Pullback - correção",
     "RV": "Reversal - reversão",
+    "SCALP": "realização curta de lucro (1:1)",
     "SGP": "Selling Pressure - pressão de venda",
     "SH": "Swing High",
     "SL": "Swing Low",
+    "SWING": "realização longa de lucro (1:2 ou maior)",
     "TBTL": "Ten Bars, Two Legs - dez barras, duas pernas",
     "TC": "Tight Channel - canal estreito",
     "TE": "Trader's Equation - equação do trader",
@@ -80,6 +83,7 @@ MEANINGS = {
     "TREV": "Trend Reversal - reversão de tendência",
     "TTR": "Tight Trading Range - lateralidade estreita",
     "W": "Wedge - cunha",
+    "WT": "With Trend - a favor da tendência",
 }
 
 
