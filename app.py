@@ -1,6 +1,7 @@
 import json
 import os
 import requests
+import sqlite3
 from flask import Flask, request
 
 
@@ -12,90 +13,13 @@ app = Flask(__name__)
 BOT_TOKEN = os.getenv("PACTIONBOT_TOKEN", "")
 
 
-MEANINGS = {
-    "2BR": "2 Bars Reversal - reversão de duas barras",
-    "2E": "Second Entry",
-    "2LT": "Second Leg Trap - armadilha de segunda perna",
-    "2S": "Second Signal",
-    "AI": "Always In",
-    "AIL": "Always In Long - modo sempre comprado",
-    "AIS": "Always In Short - modo sempre vendido",
-    "BC": "Broad Channel - canal amplo",
-    "BE": "Break Even - encerrar a operação no empate, sem lucro nem prejuízo",
-    "BGP": "Buying Pressure - pressão de compra",
-    "BLR": "Bull Reversal - reversão de alta",
-    "BLSH": "Buy Low, Sell High - comprar baixo, vender alto",
-    "BLSHS": "Buy Low, Sell High, and Scalp - comprar baixo, vender alto, e lucrar curto (1:1)",
-    "BO": "Breakout - rompimento",
-    "BOM": "Breakout Mode - modo rompimento",
-    "BP": "Breakout Pullback - rompimento e correção",
-    "BRR": "Bear Reversal - reversão de baixa",
-    "BW": "Barbwire - arame farpado",
-    "CLX": "Climax",
-    "CT": "Counter Trend - contra a tendência",
-    "DB": "Double Bottom - fundo duplo",
-    "DT": "Double Top - topo duplo",
-    "EB": "Entry Bar",
-    "EMA": "Exponential Moving Average - média móvel exponencial",
-    "FBO": "Failed Breakout - falha de rompimento",
-    "FF": "Final Flag - bandeira final",
-    "FT": "Follow Through - continuidade",
-    "G": "Gap",
-    "GB": "Gap Bar",
-    "H": "High - alto, região alta",
-    "H1": "High 1 - 1ª tentativa de retomar a tendência de alta",
-    "H2": "High 2 - 2ª tentativa de retomar a tendência de alta",
-    "H3": "High 3 - 3ª tentativa de retomar a tendência de alta",
-    "H4": "High 4 - 4ª tentativa de retomar a tendência de alta",
-    "HH": "Higher High",
-    "HL": "Higher Low",
-    "HOD": "High Of the Day - máxima do dia",
-    "HOY": "High Of Yesterday - máxima do dia anterior",
-    "HTF": "Higher Time Frame - tempo gráfico maior",
-    "IB": "Inside Bar",
-    "IOI": "Inside bar, Outside bar, Inside bar - sequência de barras dentro, fora, dentro",
-    "L": "Low - baixo, região baixa",
-    "L1": "Low 1 - 1ª tentativa de retomar a tendência de baixa",
-    "L2": "Low 2 - 2ª tentativa de retomar a tendência de baixa",
-    "L3": "Low 3 - 3ª tentativa de retomar a tendência de baixa",
-    "L4": "Low 4 - 4ª tentativa de retomar a tendência de baixa",
-    "LH": "Lower High",
-    "LL": "Lower Low",
-    "LOD": "Low Of the Day - mínima do dia",
-    "LOM": "Limit Orders Market - mercado de ordens limitadas",
-    "LOY": "Low Of Yesterday - mínima do dia anterior",
-    "M2B": "Moving average touch with Double bottom Buy - compra com fundo duplo tocando na média móvel",
-    "MM": "Major Move - movimento projetado",
-    "MTR": "Major Trend Reversal - reversão majoritária de tendência",
-    "MC": "Micro Channel",
-    "MA": "Moving Average - média móvel",
-    "OB": "Outside Bar",
-    "OIO": "Outside bar, Inside bar, Outside bar - sequência de barras fora, dentro, fora",
-    "PA": "Price Action",
-    "PB": "Pullback - correção",
-    "RV": "Reversal - reversão",
-    "SCALP": "realização curta de lucro (1:1)",
-    "SGP": "Selling Pressure - pressão de venda",
-    "SH": "Swing High",
-    "SL": "Swing Low",
-    "SWING": "realização longa de lucro (1:2 ou maior)",
-    "TBTL": "Ten Bars, Two Legs - dez barras, duas pernas",
-    "TC": "Tight Channel - canal estreito",
-    "TE": "Trader's Equation - equação do trader",
-    "TF": "Time Frame - tempo gráfico",
-    "TR": "Trading Range - lateralidade",
-    "TRADE": "operação",
-    "TRADER": "operador",
-    "TREV": "Trend Reversal - reversão de tendência",
-    "TTR": "Tight Trading Range - lateralidade estreita",
-    "W": "Wedge - cunha",
-    "WT": "With Trend - a favor da tendência",
-}
-
-
 def get_meaning(initials):
-    global MEANINGS
-    return MEANINGS.get(initials, None)
+    db = sqlite3.connect('file:pactionbot.db?mode=ro', uri=True)
+    with db:
+        c = db.cursor()
+        ss = 'SELECT a.short, a.long FROM articles AS a LEFT JOIN articles_tags AS at WHERE at.tag = ?'
+        rs = c.execute(ss, (initials,)).fetchone()
+        return rs[0] if rs else None
 
 
 def format_telegram_url(method):
