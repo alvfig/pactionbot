@@ -90,6 +90,8 @@ INSERT INTO "articles" VALUES(82,'High Probability - alta probabilidade','');
 INSERT INTO "articles" VALUES(83,'Low Probability - baixa probabilidade','');
 INSERT INTO "articles" VALUES(84,'mini contrato de dólar futuro - mercado para traders fracotes, bom mesmo é WIN!!','');
 INSERT INTO "articles" VALUES(85,'mini contrato de índice futuro - mercado para traders fracotes, bom mesmo é WDO!!','');
+INSERT INTO "articles" VALUES(86,'Expanded Triangle - triângulo expandido','');
+INSERT INTO "articles" VALUES(87,'Breakout Pullback - rompimento seguido de correção','');
 CREATE TABLE tags (
     tag TEXT NOT NULL PRIMARY KEY
 );
@@ -108,6 +110,7 @@ INSERT INTO "tags" VALUES('BLSH');
 INSERT INTO "tags" VALUES('BLSHS');
 INSERT INTO "tags" VALUES('BO');
 INSERT INTO "tags" VALUES('BOM');
+INSERT INTO "tags" VALUES('BOP');
 INSERT INTO "tags" VALUES('BP');
 INSERT INTO "tags" VALUES('BRR');
 INSERT INTO "tags" VALUES('BW');
@@ -119,6 +122,12 @@ INSERT INTO "tags" VALUES('DT');
 INSERT INTO "tags" VALUES('EB');
 INSERT INTO "tags" VALUES('EG');
 INSERT INTO "tags" VALUES('EMA');
+INSERT INTO "tags" VALUES('EXPTRI');
+INSERT INTO "tags" VALUES('EXP');
+INSERT INTO "tags" VALUES('TRI');
+INSERT INTO "tags" VALUES('EXP.TRI.');
+INSERT INTO "tags" VALUES('EXP.');
+INSERT INTO "tags" VALUES('TRI.');
 INSERT INTO "tags" VALUES('FBO');
 INSERT INTO "tags" VALUES('FF');
 INSERT INTO "tags" VALUES('FT');
@@ -274,6 +283,13 @@ INSERT INTO "articles_tags" VALUES(82,'HP');
 INSERT INTO "articles_tags" VALUES(83,'LP');
 INSERT INTO "articles_tags" VALUES(84,'WDO');
 INSERT INTO "articles_tags" VALUES(85,'WIN');
+INSERT INTO "articles_tags" VALUES(86,'EXPTRI');
+INSERT INTO "articles_tags" VALUES(86,'EXP');
+INSERT INTO "articles_tags" VALUES(86,'TRI');
+INSERT INTO "articles_tags" VALUES(86,'EXP.TRI.');
+INSERT INTO "articles_tags" VALUES(86,'EXP.');
+INSERT INTO "articles_tags" VALUES(86,'TRI.');
+INSERT INTO "articles_tags" VALUES(87,'BOP');
 CREATE TABLE articles_figures (
     article_id DECIMAL NOT NULL,
     figure_id DECIMAL NOT NULL,
