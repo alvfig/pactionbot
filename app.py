@@ -17,7 +17,7 @@ def get_meaning(initials):
     db = sqlite3.connect('file:pactionbot.db?mode=ro', uri=True)
     with db:
         c = db.cursor()
-        ss = 'SELECT a.short, a.long FROM articles AS a LEFT JOIN articles_tags AS at WHERE at.tag = ?'
+        ss = 'SELECT a.short, a.long FROM articles AS a LEFT JOIN articles_tags AS at ON a.article_id = at.article_id WHERE at.tag = ?'
         rs = c.execute(ss, (initials,)).fetchone()
         return rs[0] if rs else None
 
