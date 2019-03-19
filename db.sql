@@ -83,7 +83,7 @@ INSERT INTO "articles" VALUES(75,'Tight Trading Range - lateralidade estreita','
 INSERT INTO "articles" VALUES(76,'Wedge - cunha','');
 INSERT INTO "articles" VALUES(77,'With Trend - a favor da tendência','');
 INSERT INTO "articles" VALUES(78,'Moving average touch with double top Sell - sinal de venda com topo duplo tocando na média móvel','');
-INSERT INTO "articles" VALUES(79,'Continuous Candles - barras em continuidade','');
+INSERT INTO "articles" VALUES(79,'Consecutive Candles - sequência de barras em continuidade','');
 INSERT INTO "articles" VALUES(80,'Exausting Gaps - Gaps de exaustão','');
 INSERT INTO "articles" VALUES(81,'Lower Time Frame - tempo gráfico maior','');
 INSERT INTO "articles" VALUES(82,'High Probability - alta probabilidade','');
@@ -92,6 +92,7 @@ INSERT INTO "articles" VALUES(84,'mini contrato de dólar futuro - mercado para 
 INSERT INTO "articles" VALUES(85,'mini contrato de índice futuro - mercado para traders fracotes, bom mesmo é WDO!!','');
 INSERT INTO "articles" VALUES(86,'Expanded Triangle - triângulo expandido','');
 INSERT INTO "articles" VALUES(87,'Breakout Pullback - rompimento seguido de correção','');
+INSERT INTO "articles" VALUES(88,'Signal Bar - barra de sinal','');
 CREATE TABLE tags (
     tag TEXT NOT NULL PRIMARY KEY
 );
@@ -169,6 +170,7 @@ INSERT INTO "tags" VALUES('OIO');
 INSERT INTO "tags" VALUES('PA');
 INSERT INTO "tags" VALUES('PB');
 INSERT INTO "tags" VALUES('RV');
+INSERT INTO "tags" VALUES('SB');
 INSERT INTO "tags" VALUES('SCALP');
 INSERT INTO "tags" VALUES('SGP');
 INSERT INTO "tags" VALUES('SH');
@@ -290,6 +292,7 @@ INSERT INTO "articles_tags" VALUES(86,'EXP.TRI.');
 INSERT INTO "articles_tags" VALUES(86,'EXP.');
 INSERT INTO "articles_tags" VALUES(86,'TRI.');
 INSERT INTO "articles_tags" VALUES(87,'BOP');
+INSERT INTO "articles_tags" VALUES(88,'SB');
 CREATE TABLE articles_figures (
     article_id DECIMAL NOT NULL,
     figure_id DECIMAL NOT NULL,
