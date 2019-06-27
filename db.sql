@@ -93,6 +93,8 @@ INSERT INTO "articles" VALUES(85,'mini contrato de índice futuro - mercado para
 INSERT INTO "articles" VALUES(86,'Expanded Triangle - triângulo expandido','');
 INSERT INTO "articles" VALUES(87,'Breakout Pullback - rompimento seguido de correção','');
 INSERT INTO "articles" VALUES(88,'Signal Bar - barra de sinal','');
+INSERT INTO "articles" VALUES(89,'Buy The Close - tendência com pressão suficiente para compras próximas ao topo das barras de alta','');
+INSERT INTO "articles" VALUES(90,'Sell The Close - tendência com pressão suficiente para vendas próximas ao fundo das barras de baixa','');
 CREATE TABLE tags (
     tag TEXT NOT NULL PRIMARY KEY
 );
@@ -189,6 +191,8 @@ INSERT INTO "tags" VALUES('W');
 INSERT INTO "tags" VALUES('WT');
 INSERT INTO "tags" VALUES('WDO');
 INSERT INTO "tags" VALUES('WIN');
+INSERT INTO "tags" VALUES('BTC');
+INSERT INTO "tags" VALUES('STC');
 CREATE TABLE figures (
     figure_id DECIMAL NOT NULL PRIMARY KEY,
     image BLOB NOT NULL
@@ -293,6 +297,8 @@ INSERT INTO "articles_tags" VALUES(86,'EXP.');
 INSERT INTO "articles_tags" VALUES(86,'TRI.');
 INSERT INTO "articles_tags" VALUES(87,'BOP');
 INSERT INTO "articles_tags" VALUES(88,'SB');
+INSERT INTO "articles_tags" VALUES(89,'BTC');
+INSERT INTO "articles_tags" VALUES(90,'STC');
 CREATE TABLE articles_figures (
     article_id DECIMAL NOT NULL,
     figure_id DECIMAL NOT NULL,
