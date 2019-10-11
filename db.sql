@@ -85,7 +85,7 @@ INSERT INTO "articles" VALUES(77,'With Trend - a favor da tendência','');
 INSERT INTO "articles" VALUES(78,'Moving average touch with double top Sell - sinal de venda com topo duplo tocando na média móvel','');
 INSERT INTO "articles" VALUES(79,'Consecutive Candles - sequência de barras em continuidade','');
 INSERT INTO "articles" VALUES(80,'Exausting Gaps - Gaps de exaustão','');
-INSERT INTO "articles" VALUES(81,'Lower Time Frame - tempo gráfico maior','');
+INSERT INTO "articles" VALUES(81,'Lower Time Frame - tempo gráfico menor','');
 INSERT INTO "articles" VALUES(82,'High Probability - alta probabilidade','');
 INSERT INTO "articles" VALUES(83,'Low Probability - baixa probabilidade','');
 INSERT INTO "articles" VALUES(84,'mini contrato de dólar futuro - mercado para traders fracotes, bom mesmo é WIN!!','');
@@ -95,6 +95,7 @@ INSERT INTO "articles" VALUES(87,'Breakout Pullback - rompimento seguido de corr
 INSERT INTO "articles" VALUES(88,'Signal Bar - barra de sinal','');
 INSERT INTO "articles" VALUES(89,'Buy The Close - tendência com pressão suficiente para compras próximas ao topo das barras de alta','');
 INSERT INTO "articles" VALUES(90,'Sell The Close - tendência com pressão suficiente para vendas próximas ao fundo das barras de baixa','');
+INSERT INTO "articles" VALUES(91,'Reversal Bar - barra de reversão','');
 CREATE TABLE tags (
     tag TEXT NOT NULL PRIMARY KEY
 );
@@ -193,6 +194,7 @@ INSERT INTO "tags" VALUES('WDO');
 INSERT INTO "tags" VALUES('WIN');
 INSERT INTO "tags" VALUES('BTC');
 INSERT INTO "tags" VALUES('STC');
+INSERT INTO "tags" VALUES('RB');
 CREATE TABLE figures (
     figure_id DECIMAL NOT NULL PRIMARY KEY,
     image BLOB NOT NULL
@@ -299,6 +301,7 @@ INSERT INTO "articles_tags" VALUES(87,'BOP');
 INSERT INTO "articles_tags" VALUES(88,'SB');
 INSERT INTO "articles_tags" VALUES(89,'BTC');
 INSERT INTO "articles_tags" VALUES(90,'STC');
+INSERT INTO "articles_tags" VALUES(91,'RB');
 CREATE TABLE articles_figures (
     article_id DECIMAL NOT NULL,
     figure_id DECIMAL NOT NULL,
