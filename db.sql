@@ -57,7 +57,7 @@ INSERT INTO "articles" VALUES(49,'Low Of the Day - mínima do dia','');
 INSERT INTO "articles" VALUES(50,'Limit Orders Market - mercado de ordens limitadas','');
 INSERT INTO "articles" VALUES(51,'Low Of Yesterday - mínima do dia anterior','');
 INSERT INTO "articles" VALUES(52,'Moving average touch with double bottom Buy - sinal de compra com fundo duplo tocando na média móvel','');
-INSERT INTO "articles" VALUES(53,'Major Move - movimento projetado','');
+INSERT INTO "articles" VALUES(53,'Measured Move - movimento projetado','');
 INSERT INTO "articles" VALUES(54,'Major Trend Reversal - reversão majoritária de tendência','');
 INSERT INTO "articles" VALUES(55,'Micro Channel','');
 INSERT INTO "articles" VALUES(56,'Moving Average - média móvel','');
