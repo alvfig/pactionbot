@@ -96,6 +96,8 @@ INSERT INTO "articles" VALUES(88,'Signal Bar - barra de sinal','');
 INSERT INTO "articles" VALUES(89,'Buy The Close - tendência com pressão suficiente para compras próximas ao topo das barras de alta','');
 INSERT INTO "articles" VALUES(90,'Sell The Close - tendência com pressão suficiente para vendas próximas ao fundo das barras de baixa','');
 INSERT INTO "articles" VALUES(91,'Reversal Bar - barra de reversão','');
+INSERT INTO "articles" VALUES(92,'Big Down, Big Up - grande perna de baixa seguida de grande perna de alta','');
+INSERT INTO "articles" VALUES(93,'Big Up, Big Down - grande perna de alta seguida de grande perna de baixa','');
 CREATE TABLE tags (
     tag TEXT NOT NULL PRIMARY KEY
 );
@@ -195,6 +197,8 @@ INSERT INTO "tags" VALUES('WIN');
 INSERT INTO "tags" VALUES('BTC');
 INSERT INTO "tags" VALUES('STC');
 INSERT INTO "tags" VALUES('RB');
+INSERT INTO "tags" VALUES('BDBU');
+INSERT INTO "tags" VALUES('BUBD');
 CREATE TABLE figures (
     figure_id DECIMAL NOT NULL PRIMARY KEY,
     image BLOB NOT NULL
@@ -302,6 +306,8 @@ INSERT INTO "articles_tags" VALUES(88,'SB');
 INSERT INTO "articles_tags" VALUES(89,'BTC');
 INSERT INTO "articles_tags" VALUES(90,'STC');
 INSERT INTO "articles_tags" VALUES(91,'RB');
+INSERT INTO "articles_tags" VALUES(92,'BDBU');
+INSERT INTO "articles_tags" VALUES(93,'BUBD');
 CREATE TABLE articles_figures (
     article_id DECIMAL NOT NULL,
     figure_id DECIMAL NOT NULL,
