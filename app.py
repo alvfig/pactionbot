@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import requests
 import sqlite3
 from flask import Flask, request
@@ -27,30 +28,46 @@ def format_telegram_url(method):
     return "https://api.telegram.org/bot{}/{}".format(BOT_TOKEN, method)
 
 
-def answer_command(update):
+def cleanup(str):
+    return re.sub(r"[^0-9A-Z]", "", str.upper())
+
+
+def handle_slash(slash):
+    command = cleanup(slash)
+    if command.startswith("AJUDA") or command.startswith("HELP"):
+        return "Digite uma sigla do método Al Brooks para saber o significado.\n\nSe precisar, envie uma mensagem para o autor: @alvfig (ele é meio lento mas é boa gente!)"
+    if command.startswith("SOBRE"):
+        return "Price Action Bot\n@pactionbot\nhttps://t.me/pactionbot\n\nAutor: @alvfig"
+    return "Comando desconhecido."
+
+
+def answer_message(update):
+    '''Answer a message'''
     data = {}
     data["chat_id"] = update["message"]["chat"]["id"]
     if "text" in update["message"]:
         message = update["message"]["text"]
-        response = []
-        for initials in message.upper().split():
-            if "CAMAR" in initials:
-                response.append("É A MÃE !! CAMARÃO É A MÃE !!")
-                break
-            else:
-                meaning = get_meaning(initials)
-                if meaning:
-                    response.append("`{} = {}`".format(initials, meaning))
-        if response:
-            data["text"] = "\n".join(response)
+        if message.startswith("/"):
+            response = handle_slash(message)
         else:
-            data["text"] = "Você digitou direitinho?\n\nCalma aí, gente! Ainda tô aprendendo. Isso aqui não é fácil nem pra robô.\n\nAhhhh! Pergunta lá no posto ipiranga."
+            message = cleanup(message)
+            if "CAMAR" in message:
+                response = "`É A MÃE !! CAMARÃO É A MÃE !!`"
+            else:
+                acronym = message
+                meaning = get_meaning(acronym)
+                if meaning:
+                    response = "`{} = {}`".format(acronym, meaning)
+                else:
+                    response = "`Você digitou direitinho?\n\nCalma aí, gente! Ainda tô aprendendo. Isso aqui não é fácil nem pra robô.\n\nAhhhh! Pergunta lá no posto ipiranga.`"
+        data["text"] = response
         data["parse_mode"] = "Markdown"
         data["reply_to_message_id"] = update["message"]["message_id"]
         requests.post(format_telegram_url("sendMessage"), data=data)
 
 
-def answer_query(update):
+def answer_inline(update):
+    '''Answer a inline query'''
     data = {}
     data["inline_query_id"] = update["inline_query"]["id"]
     query = update["inline_query"]["query"]
@@ -65,9 +82,9 @@ def process_update():
     if request.method == "POST":
         update = request.get_json()
         if "message" in update:
-            answer_command(update)
+            answer_message(update)
         elif "inline_query" in update:
-            answer_query(update)
+            answer_inline(update)
         return "OK", 200
 
 
