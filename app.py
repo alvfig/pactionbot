@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import re
@@ -12,6 +13,31 @@ app = Flask(__name__)
 #BOT_TOKEN = SETUP["telegram"]["token"]
 #BOT_TOKEN = os.getenv("PACTIONBOT", BOT_TOKEN)
 BOT_TOKEN = os.getenv("PACTIONBOT_TOKEN", "")
+
+
+BaseHour = datetime.datetime(1900, 1, 1, 9)
+
+
+def bar_hour_to_number(barhour):
+    try:
+        barhour = datetime.datetime.strptime(barhour, "%H:%M")
+    except ValueError:
+        return "formato inválido"
+    global BaseHour
+    offset = barhour - BaseHour
+    barnumber = offset.seconds // 300 + 1
+    return barnumber
+
+
+def bar_number_to_hour(barnumber):
+    try:
+        barnumber = int(barnumber)
+    except ValueError:
+        return "formato inválido"
+    global BaseHour
+    offset = datetime.timedelta(minutes=5*(barnumber-1))
+    barhour = BaseHour + offset
+    return barhour.strftime("%H:%M")
 
 
 def get_meaning(initials):
@@ -38,6 +64,18 @@ def handle_slash(slash):
         return "Digite uma sigla do método Al Brooks para saber o significado.\n\nSe precisar, envie uma mensagem para o autor: @alvfig (ele é meio lento mas é boa gente!)"
     if command.startswith("SOBRE"):
         return "Price Action Bot\n@pactionbot\nhttps://t.me/pactionbot\n\nAutor: @alvfig"
+    if command.startswith("BN"):
+        try:
+            barhour = slash.split()[1]
+        except IndexError:
+            return "Use: `/bn HORA`"
+        return "{} = {}".format(barhour, bar_hour_to_number(barhour))
+    if command.startswith("BH"):
+        try:
+            barnumber = slash.split()[1]
+        except IndexError:
+            return "Use: `/bh NÚMERO`"
+        return "{} = {}".format(barnumber, bar_number_to_hour(barnumber))
     return "Comando desconhecido."
 
 
