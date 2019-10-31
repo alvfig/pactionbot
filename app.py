@@ -18,24 +18,18 @@ BOT_TOKEN = os.getenv("PACTIONBOT_TOKEN", "")
 BaseHour = datetime.datetime(1900, 1, 1, 9)
 
 
-def bar_hour_to_number(barhour):
-    try:
-        barhour = datetime.datetime.strptime(barhour, "%H:%M")
-    except ValueError:
-        return "formato inválido"
+def bar_hour_to_number(barhour, timeframe=5):
+    barhour = datetime.datetime.strptime(barhour, "%H:%M")
     global BaseHour
     offset = barhour - BaseHour
-    barnumber = offset.seconds // 300 + 1
+    barnumber = offset.seconds // (60 * timeframe) + 1
     return barnumber
 
 
-def bar_number_to_hour(barnumber):
-    try:
-        barnumber = int(barnumber)
-    except ValueError:
-        return "formato inválido"
+def bar_number_to_hour(barnumber, timeframe=5):
+    barnumber = int(barnumber)
     global BaseHour
-    offset = datetime.timedelta(minutes=5*(barnumber-1))
+    offset = datetime.timedelta(minutes=timeframe*(barnumber-1))
     barhour = BaseHour + offset
     return barhour.strftime("%H:%M")
 
@@ -66,16 +60,26 @@ def handle_slash(slash):
         return "Price Action Bot\n@pactionbot\nhttps://t.me/pactionbot\n\nAutor: @alvfig"
     if command.startswith("BN"):
         try:
-            barhour = slash.split()[1]
-        except IndexError:
-            return "Use: `/bn HORA`"
-        return "{} = {}".format(barhour, bar_hour_to_number(barhour))
+            arguments = slash.split()
+            barhour = arguments[1]
+            timeframe = 5
+            if 2 < len(arguments):
+                timeframe = int(arguments[2])
+            barnumber = bar_hour_to_number(barhour, timeframe)
+            return "{} = {}".format(barhour, barnumber)
+        except (IndexError, ValueError):
+            return "Use: `/bn HORA [TIMEFRAME em minutos]`"
     if command.startswith("BH"):
         try:
-            barnumber = slash.split()[1]
-        except IndexError:
-            return "Use: `/bh NÚMERO`"
-        return "{} = {}".format(barnumber, bar_number_to_hour(barnumber))
+            arguments = slash.split()
+            barnumber = arguments[1]
+            timeframe = 5
+            if 2 < len(arguments):
+                timeframe = int(arguments[2])
+            barhour = bar_number_to_hour(barnumber, timeframe)
+            return "{} = {}".format(barnumber, barhour)
+        except (IndexError, ValueError):
+            return "Use: `/bh NÚMERO [TIMEFRAME em minutos]`"
     return "Comando desconhecido."
 
 
