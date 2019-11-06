@@ -98,6 +98,11 @@ INSERT INTO "articles" VALUES(90,'Sell The Close - tendência com pressão sufic
 INSERT INTO "articles" VALUES(91,'Reversal Bar - barra de reversão','');
 INSERT INTO "articles" VALUES(92,'Big Down, Big Up - grande perna de baixa seguida de grande perna de alta','');
 INSERT INTO "articles" VALUES(93,'Big Up, Big Down - grande perna de alta seguida de grande perna de baixa','');
+INSERT INTO "articles" VALUES(94,'Open Of Day - preço da abertura','');
+INSERT INTO "articles" VALUES(95,'Open Of Month - preço da abertura do mês atual','');
+INSERT INTO "articles" VALUES(96,'Open Of Today - preço da abertura','');
+INSERT INTO "articles" VALUES(97,'Open Of Week - preço da abertura da semana atual','');
+INSERT INTO "articles" VALUES(98,'Open Of Yesterday - preço da abertura do pregão anterior','');
 CREATE TABLE tags (
     tag TEXT NOT NULL PRIMARY KEY
 );
@@ -199,6 +204,11 @@ INSERT INTO "tags" VALUES('STC');
 INSERT INTO "tags" VALUES('RB');
 INSERT INTO "tags" VALUES('BDBU');
 INSERT INTO "tags" VALUES('BUBD');
+INSERT INTO "tags" VALUES('OOD');
+INSERT INTO "tags" VALUES('OOM');
+INSERT INTO "tags" VALUES('OOT');
+INSERT INTO "tags" VALUES('OOW');
+INSERT INTO "tags" VALUES('OOY');
 CREATE TABLE figures (
     figure_id DECIMAL NOT NULL PRIMARY KEY,
     image BLOB NOT NULL
@@ -308,6 +318,11 @@ INSERT INTO "articles_tags" VALUES(90,'STC');
 INSERT INTO "articles_tags" VALUES(91,'RB');
 INSERT INTO "articles_tags" VALUES(92,'BDBU');
 INSERT INTO "articles_tags" VALUES(93,'BUBD');
+INSERT INTO "articles_tags" VALUES(94,'OOD');
+INSERT INTO "articles_tags" VALUES(95,'OOM');
+INSERT INTO "articles_tags" VALUES(96,'OOT');
+INSERT INTO "articles_tags" VALUES(97,'OOW');
+INSERT INTO "articles_tags" VALUES(98,'OOY');
 CREATE TABLE articles_figures (
     article_id DECIMAL NOT NULL,
     figure_id DECIMAL NOT NULL,
