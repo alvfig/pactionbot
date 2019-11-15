@@ -15,23 +15,44 @@ app = Flask(__name__)
 BOT_TOKEN = os.getenv("PACTIONBOT_TOKEN", "")
 
 
-BaseHour = datetime.datetime(1900, 1, 1, 9)
+HourFormat = "%H:%M"
+B3Start = datetime.datetime(1900, 1, 1, 9)
+B3End = datetime.datetime(1900, 1, 1, 18)
 
 
 def bar_hour_to_number(barhour, timeframe=5):
-    barhour = datetime.datetime.strptime(barhour, "%H:%M")
-    global BaseHour
-    offset = barhour - BaseHour
+    global HourFormat, B3Start
+    barhour = datetime.datetime.strptime(barhour, HourFormat)
+    offset = barhour - B3Start
     barnumber = offset.seconds // (60 * timeframe) + 1
     return barnumber
 
 
 def bar_number_to_hour(barnumber, timeframe=5):
+    global HourFormat, B3Start
     barnumber = int(barnumber)
-    global BaseHour
     offset = datetime.timedelta(minutes=timeframe*(barnumber-1))
-    barhour = BaseHour + offset
-    return barhour.strftime("%H:%M")
+    barhour = B3Start + offset
+    return barhour.strftime(HourFormat)
+
+
+def hours_range(start, end, offset=datetime.timedelta(hours=1)):
+    """Hours iterator"""
+    currenthour = start
+    while currenthour < end:
+        yield currenthour
+        currenthour += offset
+
+
+def bar_table():
+    global HourFormat, B3Start, B3End
+    table = []
+    for currenthour in hours_range(B3Start, B3End+datetime.timedelta(hours=1)):
+        table.append("{} = {:3}".format(
+            currenthour.strftime(HourFormat),
+            bar_hour_to_number(currenthour.strftime(HourFormat))
+        ))
+    return "\n".join(table)
 
 
 def get_meaning(initials):
@@ -66,10 +87,10 @@ def handle_slash(slash):
             if 2 < len(arguments):
                 timeframe = int(arguments[2])
             barnumber = bar_hour_to_number(barhour, timeframe)
-            return "{} = {}".format(barhour, barnumber)
+            return "`{} = {}`".format(barhour, barnumber)
         except (IndexError, ValueError):
             return "Use: `/bn HORA [TIMEFRAME em minutos]`"
-    if command.startswith("BH"):
+    elif command.startswith("BH"):
         try:
             arguments = slash.split()
             barnumber = arguments[1]
@@ -77,9 +98,11 @@ def handle_slash(slash):
             if 2 < len(arguments):
                 timeframe = int(arguments[2])
             barhour = bar_number_to_hour(barnumber, timeframe)
-            return "{} = {}".format(barnumber, barhour)
+            return "`{} = {}`".format(barnumber, barhour)
         except (IndexError, ValueError):
             return "Use: `/bh NÚMERO [TIMEFRAME em minutos]`"
+    elif command.startswith("BT"):
+        return "`{}`".format(bar_table())
     return "Comando desconhecido."
 
 
