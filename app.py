@@ -107,13 +107,14 @@ def handle_slash(slash):
     if command.startswith("B3"):
         index = B3FutureIndex()
         dollar = B3FutureDollar()
-        return "`O contrato atual para o índice é {}/{} com"
-    " vencimento em {}.\n\nPara o dólar é {}/{} com"
-    " vencimento em {}.`".format(
-            *index.current_names(),
+        response = "`O contrato atual para o índice é {} / {} com" \
+            " vencimento em {}.\n\nPara o dólar é {} / {} com" \
+            " vencimento em {}.`"
+        return response.format(
+            *index.current_name(),
             index.rollover_date(),
-            *dollar.current_names(),
-            dollar,rollover_date(),
+            *dollar.current_name(),
+            dollar.rollover_date(),
         )
     return "`Comando desconhecido.`"
 
