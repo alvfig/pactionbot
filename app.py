@@ -5,6 +5,7 @@ import re
 import requests
 import sqlite3
 from flask import Flask, request
+from b3futurecontracts import *
 
 
 app = Flask(__name__)
@@ -90,7 +91,7 @@ def handle_slash(slash):
             return "`{} = {}`".format(barhour, barnumber)
         except (IndexError, ValueError):
             return "Use: `/bn HORA [TIMEFRAME em minutos]`"
-    elif command.startswith("BH"):
+    if command.startswith("BH"):
         try:
             arguments = slash.split()
             barnumber = arguments[1]
@@ -101,9 +102,20 @@ def handle_slash(slash):
             return "`{} = {}`".format(barnumber, barhour)
         except (IndexError, ValueError):
             return "Use: `/bh NÚMERO [TIMEFRAME em minutos]`"
-    elif command.startswith("BT"):
+    if command.startswith("BT"):
         return "`{}`".format(bar_table())
-    return "Comando desconhecido."
+    if command.startswith("B3"):
+        index = B3FutureIndex()
+        dollar = B3FutureDollar()
+        return "`O contrato atual para o índice é {}/{} com"
+    " vencimento em {}.\n\nPara o dólar é {}/{} com"
+    " vencimento em {}.`".format(
+            *index.current_names(),
+            index.rollover_date(),
+            *dollar.current_names(),
+            dollar,rollover_date(),
+        )
+    return "`Comando desconhecido.`"
 
 
 def answer_message(update):
