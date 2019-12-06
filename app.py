@@ -137,7 +137,7 @@ def answer_message(update):
                 if meaning:
                     response = "`{} = {}`".format(acronym, meaning)
                 else:
-                    response = "`Você digitou direitinho?\n\nCalma aí, gente! Ainda tô aprendendo. Isso aqui não é fácil nem pra robô.\n\nAhhhh! Pergunta lá no posto ipiranga.`"
+                    response = "`Você digitou direitinho?\n\nCalma aí, gente! Ainda tô aprendendo. Isso aqui não é fácil nem pra robô.\n\nAhhhh! Pergunta lá no posto ipiranga.\n\n(Ou envie uma mensagem para @alvfig)`"
         data["text"] = response
         data["parse_mode"] = "Markdown"
         data["reply_to_message_id"] = update["message"]["message_id"]
