@@ -105,6 +105,8 @@ INSERT INTO "articles" VALUES(97,'Open Of Week - preço da abertura da semana at
 INSERT INTO "articles" VALUES(98,'Open Of Yesterday - preço da abertura do pregão anterior','');
 INSERT INTO "articles" VALUES(99,'Buy Signal Bar - barra de sinal de compra','');
 INSERT INTO "articles" VALUES(100,'Sell Signal Bar - barra de sinal de venda','');
+INSERT INTO "articles" VALUES(101,'All Time High - máxima cotação em toda a história do ativo','');
+INSERT INTO "articles" VALUES(102,'Parabolic Wedge - cunha parabólica, possível clímax do movimento','');
 CREATE TABLE tags (
     tag TEXT NOT NULL PRIMARY KEY
 );
@@ -213,6 +215,8 @@ INSERT INTO "tags" VALUES('OOW');
 INSERT INTO "tags" VALUES('OOY');
 INSERT INTO "tags" VALUES('BSB');
 INSERT INTO "tags" VALUES('SSB');
+INSERT INTO "tags" VALUES('ATH');
+INSERT INTO "tags" VALUES('PW');
 CREATE TABLE figures (
     figure_id DECIMAL NOT NULL PRIMARY KEY,
     image BLOB NOT NULL
@@ -329,6 +333,8 @@ INSERT INTO "articles_tags" VALUES(97,'OOW');
 INSERT INTO "articles_tags" VALUES(98,'OOY');
 INSERT INTO "articles_tags" VALUES(99,'BSB');
 INSERT INTO "articles_tags" VALUES(100,'SSB');
+INSERT INTO "articles_tags" VALUES(101,'ATH');
+INSERT INTO "articles_tags" VALUES(102,'PW');
 CREATE TABLE articles_figures (
     article_id DECIMAL NOT NULL,
     figure_id DECIMAL NOT NULL,
