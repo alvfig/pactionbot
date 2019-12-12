@@ -1,7 +1,11 @@
+import datetime
 import json
 import os
+import re
 import requests
+import sqlite3
 from flask import Flask, request
+from b3futurecontracts import *
 
 
 app = Flask(__name__)
@@ -12,90 +16,53 @@ app = Flask(__name__)
 BOT_TOKEN = os.getenv("PACTIONBOT_TOKEN", "")
 
 
-MEANINGS = {
-    "2BR": "2 Bars Reversal - reversão de duas barras",
-    "2E": "Second Entry",
-    "2LT": "Second Leg Trap - armadilha de segunda perna",
-    "2S": "Second Signal",
-    "AI": "Always In",
-    "AIL": "Always In Long - modo sempre comprado",
-    "AIS": "Always In Short - modo sempre vendido",
-    "BC": "Broad Channel - canal amplo",
-    "BE": "Break Even - encerrar a operação no empate, sem lucro nem prejuízo",
-    "BGP": "Buying Pressure - pressão de compra",
-    "BLR": "Bull Reversal - reversão de alta",
-    "BLSH": "Buy Low, Sell High - comprar baixo, vender alto",
-    "BLSHS": "Buy Low, Sell High, and Scalp - comprar baixo, vender alto, e lucrar curto (1:1)",
-    "BO": "Breakout - rompimento",
-    "BOM": "Breakout Mode - modo rompimento",
-    "BP": "Breakout Pullback - rompimento e correção",
-    "BRR": "Bear Reversal - reversão de baixa",
-    "BW": "Barbwire - arame farpado",
-    "CLX": "Climax",
-    "CT": "Counter Trend - contra a tendência",
-    "DB": "Double Bottom - fundo duplo",
-    "DT": "Double Top - topo duplo",
-    "EB": "Entry Bar",
-    "EMA": "Exponential Moving Average - média móvel exponencial",
-    "FBO": "Failed Breakout - falha de rompimento",
-    "FF": "Final Flag - bandeira final",
-    "FT": "Follow Through - continuidade",
-    "G": "Gap",
-    "GB": "Gap Bar",
-    "H": "High - alto, região alta",
-    "H1": "High 1 - 1ª tentativa de retomar a tendência de alta",
-    "H2": "High 2 - 2ª tentativa de retomar a tendência de alta",
-    "H3": "High 3 - 3ª tentativa de retomar a tendência de alta",
-    "H4": "High 4 - 4ª tentativa de retomar a tendência de alta",
-    "HH": "Higher High",
-    "HL": "Higher Low",
-    "HOD": "High Of the Day - máxima do dia",
-    "HOY": "High Of Yesterday - máxima do dia anterior",
-    "HTF": "Higher Time Frame - tempo gráfico maior",
-    "IB": "Inside Bar",
-    "IOI": "Inside bar, Outside bar, Inside bar - sequência de barras dentro, fora, dentro",
-    "L": "Low - baixo, região baixa",
-    "L1": "Low 1 - 1ª tentativa de retomar a tendência de baixa",
-    "L2": "Low 2 - 2ª tentativa de retomar a tendência de baixa",
-    "L3": "Low 3 - 3ª tentativa de retomar a tendência de baixa",
-    "L4": "Low 4 - 4ª tentativa de retomar a tendência de baixa",
-    "LH": "Lower High",
-    "LL": "Lower Low",
-    "LOD": "Low Of the Day - mínima do dia",
-    "LOM": "Limit Orders Market - mercado de ordens limitadas",
-    "LOY": "Low Of Yesterday - mínima do dia anterior",
-    "M2B": "Moving average touch with Double bottom Buy - compra com fundo duplo tocando na média móvel",
-    "MM": "Major Move - movimento projetado",
-    "MTR": "Major Trend Reversal - reversão majoritária de tendência",
-    "MC": "Micro Channel",
-    "MA": "Moving Average - média móvel",
-    "OB": "Outside Bar",
-    "OIO": "Outside bar, Inside bar, Outside bar - sequência de barras fora, dentro, fora",
-    "PA": "Price Action",
-    "PB": "Pullback - correção",
-    "RV": "Reversal - reversão",
-    "SCALP": "realização curta de lucro (1:1)",
-    "SGP": "Selling Pressure - pressão de venda",
-    "SH": "Swing High",
-    "SL": "Swing Low",
-    "SWING": "realização longa de lucro (1:2 ou maior)",
-    "TBTL": "Ten Bars, Two Legs - dez barras, duas pernas",
-    "TC": "Tight Channel - canal estreito",
-    "TE": "Trader's Equation - equação do trader",
-    "TF": "Time Frame - tempo gráfico",
-    "TR": "Trading Range - lateralidade",
-    "TRADE": "operação",
-    "TRADER": "operador",
-    "TREV": "Trend Reversal - reversão de tendência",
-    "TTR": "Tight Trading Range - lateralidade estreita",
-    "W": "Wedge - cunha",
-    "WT": "With Trend - a favor da tendência",
-}
+HourFormat = "%H:%M"
+B3Start = datetime.datetime(1900, 1, 1, 9)
+B3End = datetime.datetime(1900, 1, 1, 18)
+
+
+def bar_hour_to_number(barhour, timeframe=5):
+    global HourFormat, B3Start
+    barhour = datetime.datetime.strptime(barhour, HourFormat)
+    offset = barhour - B3Start
+    barnumber = offset.seconds // (60 * timeframe) + 1
+    return barnumber
+
+
+def bar_number_to_hour(barnumber, timeframe=5):
+    global HourFormat, B3Start
+    barnumber = int(barnumber)
+    offset = datetime.timedelta(minutes=timeframe*(barnumber-1))
+    barhour = B3Start + offset
+    return barhour.strftime(HourFormat)
+
+
+def hours_range(start, end, offset=datetime.timedelta(hours=1)):
+    """Hours iterator"""
+    currenthour = start
+    while currenthour < end:
+        yield currenthour
+        currenthour += offset
+
+
+def bar_table():
+    global HourFormat, B3Start, B3End
+    table = []
+    for currenthour in hours_range(B3Start, B3End+datetime.timedelta(hours=1)):
+        table.append("{} = {:3}".format(
+            currenthour.strftime(HourFormat),
+            bar_hour_to_number(currenthour.strftime(HourFormat))
+        ))
+    return "\n".join(table)
 
 
 def get_meaning(initials):
-    global MEANINGS
-    return MEANINGS.get(initials, None)
+    db = sqlite3.connect('file:pactionbot.db?mode=ro', uri=True)
+    with db:
+        c = db.cursor()
+        ss = 'SELECT a.short, a.long FROM articles AS a LEFT JOIN articles_tags AS at ON a.article_id = at.article_id WHERE at.tag = ?'
+        rs = c.execute(ss, (initials,)).fetchone()
+        return rs[0] if rs else None
 
 
 def format_telegram_url(method):
@@ -103,30 +70,82 @@ def format_telegram_url(method):
     return "https://api.telegram.org/bot{}/{}".format(BOT_TOKEN, method)
 
 
-def answer_command(update):
+def cleanup(str):
+    return re.sub(r"[^0-9A-Z]", "", str.upper())
+
+
+def handle_slash(slash):
+    command = cleanup(slash)
+    if command.startswith("AJUDA") or command.startswith("HELP"):
+        return "Digite uma sigla do método Al Brooks para saber o significado.\n\nSe precisar, envie uma mensagem para o autor: @alvfig (ele é meio lento mas é boa gente!)"
+    if command.startswith("SOBRE"):
+        return "Price Action Bot\n@pactionbot\nhttps://t.me/pactionbot\n\nAutor: @alvfig"
+    if command.startswith("BN"):
+        try:
+            arguments = slash.split()
+            barhour = arguments[1]
+            timeframe = 5
+            if 2 < len(arguments):
+                timeframe = int(arguments[2])
+            barnumber = bar_hour_to_number(barhour, timeframe)
+            return "`{} = {}`".format(barhour, barnumber)
+        except (IndexError, ValueError):
+            return "Use: `/bn HORA [TIMEFRAME em minutos]`"
+    if command.startswith("BH"):
+        try:
+            arguments = slash.split()
+            barnumber = arguments[1]
+            timeframe = 5
+            if 2 < len(arguments):
+                timeframe = int(arguments[2])
+            barhour = bar_number_to_hour(barnumber, timeframe)
+            return "`{} = {}`".format(barnumber, barhour)
+        except (IndexError, ValueError):
+            return "Use: `/bh NÚMERO [TIMEFRAME em minutos]`"
+    if command.startswith("BT"):
+        return "`{}`".format(bar_table())
+    if command.startswith("B3"):
+        index = B3FutureIndex()
+        dollar = B3FutureDollar()
+        response = "`O contrato atual para o índice é {} / {} com" \
+            " vencimento em {}.\n\nPara o dólar é {} / {} com" \
+            " vencimento em {}.`"
+        return response.format(
+            *index.current_name(),
+            index.rollover_date(),
+            *dollar.current_name(),
+            dollar.rollover_date(),
+        )
+    return "`Comando desconhecido.`"
+
+
+def answer_message(update):
+    '''Answer a message'''
     data = {}
     data["chat_id"] = update["message"]["chat"]["id"]
     if "text" in update["message"]:
         message = update["message"]["text"]
-        response = []
-        for initials in message.upper().split():
-            if "CAMAR" in initials:
-                response.append("É A MÃE !! CAMARÃO É A MÃE !!")
-                break
-            else:
-                meaning = get_meaning(initials)
-                if meaning:
-                    response.append("`{} = {}`".format(initials, meaning))
-        if response:
-            data["text"] = "\n".join(response)
+        if message.startswith("/"):
+            response = handle_slash(message)
         else:
-            data["text"] = "Você digitou direitinho?\n\nCalma aí, gente! Ainda tô aprendendo. Isso aqui não é fácil nem pra robô.\n\nAhhhh! Pergunta lá no posto ipiranga."
+            message = cleanup(message)
+            if "CAMAR" in message:
+                response = "`É A MÃE !! CAMARÃO É A MÃE !!`"
+            else:
+                acronym = message
+                meaning = get_meaning(acronym)
+                if meaning:
+                    response = "`{} = {}`".format(acronym, meaning)
+                else:
+                    response = "`Você digitou direitinho?\n\nCalma aí, gente! Ainda tô aprendendo. Isso aqui não é fácil nem pra robô.\n\nAhhhh! Pergunta lá no posto ipiranga.\n\n(Ou envie uma mensagem para @alvfig)`"
+        data["text"] = response
         data["parse_mode"] = "Markdown"
         data["reply_to_message_id"] = update["message"]["message_id"]
         requests.post(format_telegram_url("sendMessage"), data=data)
 
 
-def answer_query(update):
+def answer_inline(update):
+    '''Answer a inline query'''
     data = {}
     data["inline_query_id"] = update["inline_query"]["id"]
     query = update["inline_query"]["query"]
@@ -141,9 +160,9 @@ def process_update():
     if request.method == "POST":
         update = request.get_json()
         if "message" in update:
-            answer_command(update)
+            answer_message(update)
         elif "inline_query" in update:
-            answer_query(update)
+            answer_inline(update)
         return "OK", 200
 
 
