@@ -1,4 +1,5 @@
 b3futurecontracts
+beautifulsoup4
 flask
 requests
 zappa

@@ -5,6 +5,7 @@ import re
 import requests
 import sqlite3
 from flask import Flask, request
+from bs4 import BeautifulSoup
 from b3futurecontracts import *
 
 
@@ -74,6 +75,39 @@ def cleanup(str):
     return re.sub(r"[^0-9A-Z]", "", str.upper())
 
 
+def extract_adjust(table, contract):
+    table_td = table.find('td', string=re.compile(contract))
+    table_tr = table_td.parent
+    return table_tr.find_all('td')[3].string
+
+
+def parse_html(html_text):
+    soup = BeautifulSoup(html_text, 'html.parser')
+
+    # DOL
+    adjust_string = extract_adjust(soup.table, r'\bDOL\b')
+    adjust_dol = 1000 * float(adjust_string.replace(',', ''))
+
+    # IND
+    adjust_string = extract_adjust(soup.table, r'\bIND\b')
+    adjust_ind = float(adjust_string.replace('.', ''))
+
+    return adjust_dol, adjust_ind
+
+
+def acquire_adjusts():
+    response = requests.get('http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-ajustes-do-pregao-ptBR.asp')
+    html_text = response.text
+    adjust_dol, adjust_ind = parse_html(html_text)
+    dol_bound = 0.06
+    dol_floor = (1 - dol_bound) * adjust_dol
+    dol_ceil = (1 + dol_bound) * adjust_dol
+    ind_bound = 0.10
+    ind_floor = (1 - ind_bound) * adjust_ind
+    ind_ceil = (1 + ind_bound) * adjust_ind
+    return adjust_dol, dol_floor, dol_ceil, adjust_ind, ind_floor, ind_ceil
+
+
 def handle_slash(slash):
     command = cleanup(slash)
     if command.startswith("AJUDA") or command.startswith("HELP"):
@@ -107,14 +141,24 @@ def handle_slash(slash):
     if command.startswith("B3"):
         index = B3FutureIndex()
         dollar = B3FutureDollar()
+        adjust_dol, dol_floor, dol_ceil, adjust_ind, ind_floor, ind_ceil = acquire_adjusts()
         response = "`O contrato atual para o índice é {} / {} com" \
             " vencimento em {}.\n\nPara o dólar é {} / {} com" \
-            " vencimento em {}.`"
+            " vencimento em {}.\n\nO ajuste do índice é {}, então se" \
+            " ultrapassar o intervalo abaixo está sujeito à paralisação." \
+            "\n\n{} - {}\n\nO ajuste do dólar é {:.4f} e seu" \
+            " intervalo crítico segue abaixo.\n\n{:.4f} - {:.4f}`"
         return response.format(
             *index.current_name(),
             index.rollover_date(),
             *dollar.current_name(),
             dollar.rollover_date(),
+            int(adjust_ind),
+            int(ind_floor),
+            int(ind_ceil),
+            adjust_dol,
+            dol_floor,
+            dol_ceil,
         )
     return "`Comando desconhecido.`"
 
