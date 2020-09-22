@@ -109,6 +109,9 @@ INSERT INTO "articles" VALUES(101,'All Time High - máxima cotação em toda a h
 INSERT INTO "articles" VALUES(102,'Parabolic Wedge - cunha parabólica, possível clímax do movimento','');
 INSERT INTO "articles" VALUES(103,'Consecutive inside bars - barras internas consecutivas','');
 INSERT INTO "articles" VALUES(104,'Consecutive outside bars - barras externas consecutivas','');
+INSERT INTO "articles" VALUES(105,'Support and/or Resistance, depending on context - suporte ou resistência, dependendo do contexto','');
+INSERT INTO "articles" VALUES(106,'Trend Bar - barra de tendência','');
+INSERT INTO "articles" VALUES(107,'Gaps','');
 CREATE TABLE tags (
     tag TEXT NOT NULL PRIMARY KEY
 );
@@ -221,6 +224,9 @@ INSERT INTO "tags" VALUES('ATH');
 INSERT INTO "tags" VALUES('PW');
 INSERT INTO "tags" VALUES('II');
 INSERT INTO "tags" VALUES('OO');
+INSERT INTO "tags" VALUES('SR');
+INSERT INTO "tags" VALUES('TB');
+INSERT INTO "tags" VALUES('GS');
 CREATE TABLE figures (
     figure_id DECIMAL NOT NULL PRIMARY KEY,
     image BLOB NOT NULL
@@ -341,6 +347,9 @@ INSERT INTO "articles_tags" VALUES(101,'ATH');
 INSERT INTO "articles_tags" VALUES(102,'PW');
 INSERT INTO "articles_tags" VALUES(103,'II');
 INSERT INTO "articles_tags" VALUES(104,'OO');
+INSERT INTO "articles_tags" VALUES(105,'SR');
+INSERT INTO "articles_tags" VALUES(106,'TB');
+INSERT INTO "articles_tags" VALUES(107,'GS');
 CREATE TABLE articles_figures (
     article_id DECIMAL NOT NULL,
     figure_id DECIMAL NOT NULL,
