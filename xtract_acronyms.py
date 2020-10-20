@@ -4,9 +4,7 @@ import sys
 from bs4 import BeautifulSoup
 
 
-def main(filename):
-    with open(filename, 'rb') as f:
-        content = f.read()
+def xtract(content):
     bs = BeautifulSoup(content, 'html5lib')
     tables = bs.find_all('table')
     for table in tables:
@@ -20,8 +18,15 @@ def main(filename):
                 for tablerow in table.find_all('tr'):
                     columns = tablerow.find_all('td') or tablerow.find_all('th')
                     if len(columns) == 2:
-                        print('{}|{}'.format(columns[0].get_text(), columns[1].get_text()))
+                        yield '{}|{}'.format(columns[0].get_text(), columns[1].get_text())
                 break
+
+
+def main(filename):
+    with open(filename, 'rb') as f:
+        content = f.read()
+    for line in xtract(content):
+        print(line)
 
 
 if __name__ == '__main__':
