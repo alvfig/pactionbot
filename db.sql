@@ -112,6 +112,8 @@ INSERT INTO "articles" VALUES(104,'Consecutive outside bars - barras externas co
 INSERT INTO "articles" VALUES(105,'Support and/or Resistance, depending on context - suporte ou resistência, dependendo do contexto','');
 INSERT INTO "articles" VALUES(106,'Trend Bar - barra de tendência','');
 INSERT INTO "articles" VALUES(107,'Gaps','');
+INSERT INTO "articles" VALUES(108,'Micro Double Bottom - micro fundo duplo','');
+INSERT INTO "articles" VALUES(109,'Micro Double Top - micro topo duplo','');
 CREATE TABLE tags (
     tag TEXT NOT NULL PRIMARY KEY
 );
@@ -227,6 +229,8 @@ INSERT INTO "tags" VALUES('OO');
 INSERT INTO "tags" VALUES('SR');
 INSERT INTO "tags" VALUES('TB');
 INSERT INTO "tags" VALUES('GS');
+INSERT INTO "tags" VALUES('MDB');
+INSERT INTO "tags" VALUES('MDT');
 CREATE TABLE figures (
     figure_id DECIMAL NOT NULL PRIMARY KEY,
     image BLOB NOT NULL
@@ -350,6 +354,8 @@ INSERT INTO "articles_tags" VALUES(104,'OO');
 INSERT INTO "articles_tags" VALUES(105,'SR');
 INSERT INTO "articles_tags" VALUES(106,'TB');
 INSERT INTO "articles_tags" VALUES(107,'GS');
+INSERT INTO "articles_tags" VALUES(108,'MDB');
+INSERT INTO "articles_tags" VALUES(109,'MDT');
 CREATE TABLE articles_figures (
     article_id DECIMAL NOT NULL,
     figure_id DECIMAL NOT NULL,
