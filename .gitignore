@@ -1,4 +1,5 @@
 *.db
 env.sh
 venv
+__pycache__/
 zappa_settings.json
