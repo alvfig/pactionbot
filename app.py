@@ -84,6 +84,15 @@ def extract_adjust(table, contract):
 def parse_html(html_text):
     soup = BeautifulSoup(html_text, 'html.parser')
 
+    # Date
+    adjust_date = None
+    element = soup.select_one('p.legenda')
+    if element is not None:
+        extract = re.search('(\d{2}/\d{2}/\d{4})', element.get_text())
+        if extract is not None:
+            adjust_date = extract.group(1)
+            adjust_date = datetime.datetime.strptime(adjust_date, '%d/%m/%Y').date()
+
     # DOL
     adjust_string = extract_adjust(soup.table, r'\bDOL\b')
     adjust_dol = 1000 * float(adjust_string.replace(',', ''))
@@ -92,20 +101,20 @@ def parse_html(html_text):
     adjust_string = extract_adjust(soup.table, r'\bIND\b')
     adjust_ind = float(adjust_string.replace('.', ''))
 
-    return adjust_dol, adjust_ind
+    return adjust_date, adjust_dol, adjust_ind
 
 
 def acquire_adjusts():
     response = requests.get('http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-ajustes-do-pregao-ptBR.asp')
     html_text = response.text
-    adjust_dol, adjust_ind = parse_html(html_text)
+    adjust_date, adjust_dol, adjust_ind = parse_html(html_text)
     dol_bound = 0.06
     dol_floor = (1 - dol_bound) * adjust_dol
     dol_ceil = (1 + dol_bound) * adjust_dol
     ind_bound = 0.10
     ind_floor = (1 - ind_bound) * adjust_ind
     ind_ceil = (1 + ind_bound) * adjust_ind
-    return adjust_dol, dol_floor, dol_ceil, adjust_ind, ind_floor, ind_ceil
+    return adjust_date, adjust_dol, dol_floor, dol_ceil, adjust_ind, ind_floor, ind_ceil
 
 
 def handle_slash(slash):
@@ -141,24 +150,33 @@ def handle_slash(slash):
     if command.startswith("B3"):
         index = B3FutureIndex()
         dollar = B3FutureDollar()
-        adjust_dol, dol_floor, dol_ceil, adjust_ind, ind_floor, ind_ceil = acquire_adjusts()
-        response = "`O contrato atual para o índice é {} / {} com" \
-            " vencimento em {}.\n\nPara o dólar é {} / {} com" \
-            " vencimento em {}.\n\nO ajuste do índice é {}, então se" \
-            " ultrapassar o intervalo abaixo está sujeito à paralisação." \
-            "\n\n{} - {}\n\nO ajuste do dólar é {:.4f} e seu" \
-            " intervalo crítico segue abaixo.\n\n{:.4f} - {:.4f}`"
+        adjust_date, adjust_dol, dol_floor, dol_ceil, adjust_ind, ind_floor, ind_ceil = acquire_adjusts()
+        response = """`\
+ Contrato Atual |    Até dia | Próximo Contrato
+----------------|------------|-----------------
+{} / {} | {} |  {} / {}
+{} / {} | {} |  {} / {}
+
+        |    Mínimo |    Ajuste |    Máximo
+--------|-----------|-----------|----------
+WIN 10% |    {} |    {} |    {}
+WDO  6% | {:.4f} | {:.4f} | {:.4f}
+Ajuste atualizado em {}
+`"""
         return response.format(
             *index.current_name(),
             index.rollover_date(),
+            *index.current_name(index.rollover_date()+datetime.timedelta(days=1)),
             *dollar.current_name(),
             dollar.rollover_date(),
-            int(adjust_ind),
+            *dollar.current_name(dollar.rollover_date()+datetime.timedelta(days=1)),
             int(ind_floor),
+            int(adjust_ind),
             int(ind_ceil),
-            adjust_dol,
             dol_floor,
+            adjust_dol,
             dol_ceil,
+            adjust_date,
         )
     return "`Comando desconhecido.`"
 
@@ -183,9 +201,48 @@ def answer_message(update):
                 else:
                     response = "`Você digitou direitinho?\n\nCalma aí, gente! Ainda tô aprendendo. Isso aqui não é fácil nem pra robô.\n\nAhhhh! Pergunta lá no posto ipiranga.\n\n(Ou envie uma mensagem para @alvfig)`"
         data["text"] = response
+        # data["parse_mode"] = "MarkdownV2"
         data["parse_mode"] = "Markdown"
         data["reply_to_message_id"] = update["message"]["message_id"]
-        requests.post(format_telegram_url("sendMessage"), data=data)
+        # data["reply_markup"] = {
+        #     "keyboard": [
+        #         [
+        #             "insultar",
+        #             "implorar",
+        #             "tbtl",
+        #         ],
+        #         [
+        #             "2lt",
+        #             "m2b",
+        #             "m2s",
+        #         ],
+        #     ],
+        #     "resize_keyboard": True,
+        #     "one_time_keyboard": True,
+        # }
+        # requests.post(format_telegram_url("sendMessage"), data=data)
+        sender = [
+            datetime.datetime.fromtimestamp(update["message"]["date"]).isoformat(),
+            'USER:',
+            str(update["message"]["from"]["id"]),
+            update["message"]["from"]["first_name"],
+        ]
+        if "last_name" in update["message"]["from"]:
+            sender.append(update["message"]["from"]["last_name"])
+        else:
+            sender.append("NO_LASTNAME")
+        if 'username' in update["message"]["from"]:
+            sender.append(update["message"]["from"]["username"])
+        else:
+            sender.append("NO_USERNAME")
+        sender = ' '.join(sender)
+        print(sender)
+        print(update["message"]["text"])
+        print(data["text"])
+        print(30*'=')
+        print(data)
+        data["method"] = "sendMessage"
+        return data
 
 
 def answer_inline(update):
@@ -194,8 +251,10 @@ def answer_inline(update):
     data["inline_query_id"] = update["inline_query"]["id"]
     query = update["inline_query"]["query"]
     data["results"] = [{"InlineQueryResultArticle": {"type": "article", "id": "0", "title": "Sigla", "input_message_content": {"InputTextMessageContent": {"message_text": "`Ten Bars, Two Legs`", "parse_mode": "Markdown"}}}}]
-    r = requests.post(format_telegram_url("answerInlineQuery"), data=data)
+    # r = requests.post(format_telegram_url("answerInlineQuery"), data=data)
     print(json.loads(r.text))
+    data["method"] = "answerInlineQuery"
+    return data
 
 
 @app.route("/", methods=["POST"])
@@ -204,9 +263,9 @@ def process_update():
     if request.method == "POST":
         update = request.get_json()
         if "message" in update:
-            answer_message(update)
-        elif "inline_query" in update:
-            answer_inline(update)
+            return answer_message(update)
+        if "inline_query" in update:
+            return answer_inline(update)
         return "OK", 200
 
 
