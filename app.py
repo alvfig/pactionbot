@@ -152,7 +152,7 @@ def handle_slash(slash):
         dollar = B3FutureDollar()
         adjust_date, adjust_dol, dol_floor, dol_ceil, adjust_ind, ind_floor, ind_ceil = acquire_adjusts()
         response = """`\
- Contrato Atual |    Até dia | Próximo Contrato
+ Contrato Atual | Vencimento | Próximo Contrato
 ----------------|------------|-----------------
 {} / {} | {} |  {} / {}
 {} / {} | {} |  {} / {}
