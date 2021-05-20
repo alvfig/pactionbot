@@ -104,16 +104,20 @@ def parse_html(html_text):
     return adjust_date, adjust_dol, adjust_ind
 
 
+def five_normalize(value):
+    return value // 5 * 5
+
+
 def acquire_adjusts():
     response = requests.get('http://www2.bmf.com.br/pages/portal/bmfbovespa/lumis/lum-ajustes-do-pregao-ptBR.asp')
     html_text = response.text
     adjust_date, adjust_dol, adjust_ind = parse_html(html_text)
     dol_bound = 0.06
-    dol_floor = (1 - dol_bound) * adjust_dol
-    dol_ceil = (1 + dol_bound) * adjust_dol
+    dol_floor = five_normalize(10 * (1 - dol_bound) * adjust_dol + 5) / 10
+    dol_ceil = five_normalize(10 * (1 + dol_bound) * adjust_dol) / 10
     ind_bound = 0.10
-    ind_floor = (1 - ind_bound) * adjust_ind
-    ind_ceil = (1 + ind_bound) * adjust_ind
+    ind_floor = five_normalize((1 - ind_bound) * adjust_ind + 5)
+    ind_ceil = five_normalize((1 + ind_bound) * adjust_ind)
     return adjust_date, adjust_dol, dol_floor, dol_ceil, adjust_ind, ind_floor, ind_ceil
 
 
@@ -151,25 +155,26 @@ def handle_slash(slash):
         index = B3FutureIndex()
         dollar = B3FutureDollar()
         adjust_date, adjust_dol, dol_floor, dol_ceil, adjust_ind, ind_floor, ind_ceil = acquire_adjusts()
-        response = """`\
- Contrato Atual | Vencimento | Próximo Contrato
-----------------|------------|-----------------
-{} / {} | {} |  {} / {}
-{} / {} | {} |  {} / {}
+        response = """`
+ Contrato | Vencimento |  Próximo
+    Atual |            | Contrato
+----------|------------|---------
+   {} | {} |   {}
+   {} | {} |   {}
 
-        |    Mínimo |    Ajuste |    Máximo
---------|-----------|-----------|----------
-WIN 10% |    {} |    {} |    {}
-WDO  6% | {:.4f} | {:.4f} | {:.4f}
+        | Mínimo | Ajuste | Máximo
+--------|--------|--------|-------
+WIN 10% | {} | {} | {}
+WDO  6% | {:.1f} | {:.1f} | {:.1f}
 Ajuste atualizado em {}
 `"""
         return response.format(
-            *index.current_name(),
+            index.current_name()[0],
             index.rollover_date(),
-            *index.current_name(index.rollover_date()+datetime.timedelta(days=1)),
-            *dollar.current_name(),
+            index.current_name(index.rollover_date()+datetime.timedelta(days=1))[0],
+            dollar.current_name()[0],
             dollar.rollover_date(),
-            *dollar.current_name(dollar.rollover_date()+datetime.timedelta(days=1)),
+            dollar.current_name(dollar.rollover_date()+datetime.timedelta(days=1))[0],
             int(ind_floor),
             int(adjust_ind),
             int(ind_ceil),
