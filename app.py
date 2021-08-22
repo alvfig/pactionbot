@@ -156,30 +156,34 @@ def handle_slash(slash):
         dollar = B3FutureDollar()
         adjust_date, adjust_dol, dol_floor, dol_ceil, adjust_ind, ind_floor, ind_ceil = acquire_adjusts()
         response = """`
- Contrato | Vencimento |  Próximo
-    Atual |            | Contrato
-----------|------------|---------
-   {} | {} |   {}
-   {} | {} |   {}
+  Contratos Futuros
+      |   WIN |   WDO
+------|-------|------
+Atual |   {} |   {}
+Venc. | {} | {}
+Próx. |   {} |   {}
 
-        | Mínimo | Ajuste | Máximo
---------|--------|--------|-------
-WIN 10% | {} | {} | {}
-WDO  6% | {:.1f} | {:.1f} | {:.1f}
-Ajuste atualizado em {}
+   Ajustes e Limites de
+      Circuit-Break
+       | WIN 10% |  WDO 6%
+-------|---------|--------
+Mínimo |  {} |  {:.1f}
+Ajuste |  {} |  {:.1f}
+Máximo |  {} |  {:.1f}
+Atualizado em {}
 `"""
         return response.format(
-            index.current_name()[0],
-            index.rollover_date(),
-            index.current_name(index.rollover_date()+datetime.timedelta(days=1))[0],
-            dollar.current_name()[0],
-            dollar.rollover_date(),
-            dollar.current_name(dollar.rollover_date()+datetime.timedelta(days=1))[0],
+            index.current_name()[0][3:],
+            dollar.current_name()[0][3:],
+            index.rollover_date().strftime("%d/%m"),
+            dollar.rollover_date().strftime("%d/%m"),
+            index.current_name(index.rollover_date()+datetime.timedelta(days=1))[0][3:],
+            dollar.current_name(dollar.rollover_date()+datetime.timedelta(days=1))[0][3:],
             int(ind_floor),
-            int(adjust_ind),
-            int(ind_ceil),
             dol_floor,
+            int(adjust_ind),
             adjust_dol,
+            int(ind_ceil),
             dol_ceil,
             adjust_date,
         )
