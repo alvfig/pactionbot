@@ -167,9 +167,9 @@ Próx. |   {} |   {}
       Circuit-Break
        | WIN 10% |  WDO 6%
 -------|---------|--------
-Mínimo |  {} |  {:.1f}
-Ajuste |  {} |  {:.1f}
-Máximo |  {} |  {:.1f}
+Mínimo |  {:6} |  {:.1f}
+Ajuste |  {:6} |  {:.1f}
+Máximo |  {:6} |  {:.1f}
 Atualizado em {}
 `"""
         return response.format(
